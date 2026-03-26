@@ -45,9 +45,13 @@
                                     Stock disponible: {{ product.stock }}
                                 </p>
 
-                                <a href="#" class="btn btn-dark w-100 disabled">
-                                    Ver detalle
-                                </a>
+                                    <a href="{% url 'store:product_detail' product.pk %}" class="btn btn-outline-dark btn-sm">
+                                        Ver detalle
+                                    </a>
+                                        <a href="{% url 'store:add_to_cart' product.pk %}" class="btn btn-dark btn-sm">
+                                            Agregar
+                                        </a>
+                                
                             </div>
                         </div>
                     </div>
