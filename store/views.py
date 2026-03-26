@@ -1,8 +1,10 @@
 from decimal import Decimal
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import CheckoutForm
 from .models import Product
 
 
@@ -85,3 +87,54 @@ def remove_from_cart(request, pk):
         messages.info(request, f'"{product.name}" fue eliminado del carrito.')
 
     return redirect("store:cart_detail")
+
+@login_required
+def checkout(request):
+    cart = request.session.get("cart", {})
+
+    if not cart:
+        return redirect("cart_detail")
+
+    cart_items = []
+    total = Decimal("0")
+
+    for product_id, quantity in cart.items():
+        product = get_object_or_404(Product, pk=product_id)
+        quantity = int(quantity)
+        subtotal = product.price * quantity
+        total += subtotal
+
+        cart_items.append({
+            "product": product,
+            "quantity": quantity,
+            "subtotal": subtotal,
+        })
+
+    if request.method == "POST":
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            order = form.save(commit=False)
+            order.user = request.user
+            order.save()
+
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item["product"],
+                    price=item["product"].price,
+                    quantity=item["quantity"],
+                )
+
+            request.session["cart"] = {}
+            request.session.modified = True
+
+            return redirect("checkout_success", order_id=order.id)
+    else:
+        form = CheckoutForm()
+
+    context = {
+        "form": form,
+        "cart_items": cart_items,
+        "total": total,
+    }
+    return render(request, "store/checkout.html", context)
