@@ -118,12 +118,30 @@ def checkout(request):
             order.save()
 
             for item in cart_items:
+                product = item["product"]
+                quantity = item["quantity"]
+
+                # Validar stock suficiente
+                if product.stock < quantity:
+                    form.add_error(None, f"No hay suficiente stock para {product.name}.")
+                    order.delete()
+                    return render(request, "store/checkout.html", {
+                        "form": form,
+                        "cart_items": cart_items,
+                        "total": total,
+                    })
+
+                # Crear item
                 OrderItem.objects.create(
                     order=order,
-                    product=item["product"],
-                    price=item["product"].price,
-                    quantity=item["quantity"],
+                    product=product,
+                    price=product.price,
+                    quantity=quantity,
                 )
+
+                # Descontar stock
+                product.stock -= quantity
+                product.save()
 
             request.session["cart"] = {}
             request.session.modified = True
