@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block title %}Inicio | Ecommerce{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
+    <div class="container-fluid py-4">
+        <h1 class="display-5 fw-bold">Bienvenida a tu Ecommerce</h1>
+        <p class="col-md-8 fs-5">
+            Proyecto desarrollado con Django, PostgreSQL y Bootstrap.
+        </p>
+        <p class="text-muted mb-4">
+            Ya cuenta con catálogo, carrito, checkout y persistencia en base de datos.
+            Ahora estamos incorporando autenticación de usuarios.
+        </p>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'store:product_list' %}" class="btn btn-dark">Ver catálogo</a>
+            <a href="/admin/" class="btn btn-outline-secondary">Panel admin</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
