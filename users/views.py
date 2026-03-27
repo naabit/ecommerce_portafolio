@@ -1,8 +1,9 @@
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.views import View
+from .forms import UserRegisterForm
 
 
 class UserLoginView(LoginView):
@@ -26,4 +27,18 @@ class UserLogoutView(View):
 
 
 def register(request):
-    return render(request, "users/register.html")
+    if request.method == "POST":
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+
+            login(request, user)  # login automático
+            messages.success(request, "Cuenta creada correctamente.")
+
+            return redirect("core:home")
+        else:
+            messages.error(request, "Por favor corrige los errores.")
+    else:
+        form = UserRegisterForm()
+
+    return render(request, "users/register.html", {"form": form})
