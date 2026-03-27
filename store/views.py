@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CheckoutForm
-from .models import Product
+from .models import OrderItem, Product
 
 
 def home(request):
@@ -93,7 +93,7 @@ def checkout(request):
     cart = request.session.get("cart", {})
 
     if not cart:
-        return redirect("cart_detail")
+        return redirect("store:cart_detail")
 
     cart_items = []
     total = Decimal("0")
@@ -128,7 +128,7 @@ def checkout(request):
             request.session["cart"] = {}
             request.session.modified = True
 
-            return redirect("checkout_success", order_id=order.id)
+            return redirect("store:checkout_success", order_id=order.id)
     else:
         form = CheckoutForm()
 

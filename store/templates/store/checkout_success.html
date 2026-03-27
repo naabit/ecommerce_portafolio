@@ -1,0 +1,104 @@
+{% extends "store/base.html" %}
+{% load humanize %}
+
+{% block title %}Compra confirmada | Ecommerce{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="mb-3 fs-1">✅</div>
+                        <h1 class="h2 mb-2">¡Compra confirmada!</h1>
+                        <p class="text-muted mb-0">
+                            Tu pedido fue registrado correctamente.
+                        </p>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <p class="text-muted small mb-1">Número de orden</p>
+                                <p class="fw-bold mb-0">#{{ order.id }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <p class="text-muted small mb-1">Fecha</p>
+                                <p class="fw-bold mb-0">{{ order.created_at|date:"d/m/Y H:i" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <p class="text-muted small mb-1">Comprador</p>
+                                <p class="fw-bold mb-0">{{ order.full_name }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <p class="text-muted small mb-1">Correo</p>
+                                <p class="fw-bold mb-0">{{ order.email }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="border rounded p-3">
+                                <p class="text-muted small mb-1">Dirección de entrega</p>
+                                <p class="fw-bold mb-0">{{ order.address }}, {{ order.city }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="h4 mb-3">Detalle del pedido</h2>
+
+                        {% if order.items.all %}
+                            <div class="list-group list-group-flush">
+                                {% for item in order.items.all %}
+                                    <div class="list-group-item px-0">
+                                        <div class="d-flex justify-content-between align-items-start gap-3">
+                                            <div>
+                                                <h3 class="h6 mb-1">{{ item.product.name }}</h3>
+                                                <p class="text-muted small mb-0">
+                                                    Cantidad: {{ item.quantity }} ×
+                                                    ${{ item.price|floatformat:0|intcomma }}
+                                                </p>
+                                            </div>
+                                            <div class="text-end fw-semibold">
+                                                ${{ item.subtotal|floatformat:0|intcomma }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
+                                <span class="fw-bold">Total pagado</span>
+                                <span class="fw-bold fs-5">
+                                    ${{ order.total|floatformat:0|intcomma }}
+                                </span>
+                            </div>
+                        {% else %}
+                            <p class="text-muted mb-0">No hay ítems registrados en esta orden.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        <a href="{% url 'store:product_list' %}" class="btn btn-dark">
+                            Volver al catálogo
+                        </a>
+                        <a href="{% url 'store:home' %}" class="btn btn-outline-secondary">
+                            Ir al inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
