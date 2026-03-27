@@ -138,3 +138,15 @@ def checkout(request):
         "total": total,
     }
     return render(request, "store/checkout.html", context)
+
+@login_required
+def checkout_success(request, order_id):
+    order = get_object_or_404(
+        request.user.orders.prefetch_related("items__product"),
+        pk=order_id,
+    )
+
+    context = {
+        "order": order,
+    }
+    return render(request, "store/checkout_success.html", context)
