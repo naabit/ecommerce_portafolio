@@ -46,9 +46,13 @@
                             <span class="nav-link">Hola, {{ user.username }}</span>
                         </li>
 
-                        {% if user.is_staff %}
+                        {% if user.is_superuser %}
                             <li class="nav-item">
-                                <a class="nav-link" href="/admin/">Administración</a>
+                                <a class="nav-link" href="/admin/">Admin total</a>
+                            </li>
+                        {% elif user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin/">Panel staff</a>
                             </li>
                         {% endif %}
 
