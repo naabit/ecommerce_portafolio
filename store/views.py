@@ -8,9 +8,9 @@ from .forms import CheckoutForm
 from .models import OrderItem, Product
 
 
-def home(request):
-    return render(request, "store/home.html")
-
+# =========================
+# Catálogo
+# =========================
 
 def product_list(request):
     products = Product.objects.select_related("category").all()
@@ -20,9 +20,14 @@ def product_list(request):
 def product_detail(request, pk):
     product = get_object_or_404(
         Product.objects.select_related("category"),
-        pk=pk
+        pk=pk,
     )
     return render(request, "store/product_detail.html", {"product": product})
+
+
+# =========================
+# Carrito
+# =========================
 
 @login_required
 def add_to_cart(request, pk):
@@ -30,7 +35,6 @@ def add_to_cart(request, pk):
 
     cart = request.session.get("cart", {})
     product_id = str(product.pk)
-
     current_quantity = cart.get(product_id, 0)
 
     if current_quantity < product.stock:
@@ -41,10 +45,11 @@ def add_to_cart(request, pk):
     else:
         messages.warning(
             request,
-            f'No puedes agregar más unidades de "{product.name}" porque supera el stock disponible.'
+            f'No puedes agregar más unidades de "{product.name}" porque supera el stock disponible.',
         )
 
     return redirect("store:cart_detail")
+
 
 @login_required
 def cart_detail(request):
@@ -73,6 +78,7 @@ def cart_detail(request):
     }
     return render(request, "store/cart_detail.html", context)
 
+
 @login_required
 def remove_from_cart(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -88,11 +94,17 @@ def remove_from_cart(request, pk):
 
     return redirect("store:cart_detail")
 
+
+# =========================
+# Checkout
+# =========================
+
 @login_required
 def checkout(request):
     cart = request.session.get("cart", {})
 
     if not cart:
+        messages.warning(request, "Tu carrito está vacío.")
         return redirect("store:cart_detail")
 
     cart_items = []
@@ -112,6 +124,7 @@ def checkout(request):
 
     if request.method == "POST":
         form = CheckoutForm(request.POST)
+
         if form.is_valid():
             order = form.save(commit=False)
             order.user = request.user
@@ -121,17 +134,16 @@ def checkout(request):
                 product = item["product"]
                 quantity = item["quantity"]
 
-                # Validar stock suficiente
                 if product.stock < quantity:
                     form.add_error(None, f"No hay suficiente stock para {product.name}.")
                     order.delete()
-                    return render(request, "store/checkout.html", {
+                    context = {
                         "form": form,
                         "cart_items": cart_items,
                         "total": total,
-                    })
+                    }
+                    return render(request, "store/checkout.html", context)
 
-                # Crear item
                 OrderItem.objects.create(
                     order=order,
                     product=product,
@@ -139,12 +151,12 @@ def checkout(request):
                     quantity=quantity,
                 )
 
-                # Descontar stock
                 product.stock -= quantity
                 product.save()
 
             request.session["cart"] = {}
             request.session.modified = True
+            messages.success(request, "Compra realizada correctamente.")
 
             return redirect("store:checkout_success", order_id=order.id)
     else:
@@ -156,6 +168,11 @@ def checkout(request):
         "total": total,
     }
     return render(request, "store/checkout.html", context)
+
+
+# =========================
+# Confirmación
+# =========================
 
 @login_required
 def checkout_success(request, order_id):

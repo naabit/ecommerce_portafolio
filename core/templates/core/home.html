@@ -6,6 +6,18 @@
 <div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
     <div class="container-fluid py-4">
         <h1 class="display-5 fw-bold">Bienvenida a tu Ecommerce</h1>
+            {% if user.is_authenticated %}
+        <p class="text-muted">
+            Sesión iniciada como:
+            {% if user.is_superuser %}
+                Administrador
+            {% elif user.is_staff %}
+                Staff
+            {% else %}
+                Cliente
+            {% endif %}
+        </p>
+    {% endif %}
         <p class="col-md-8 fs-5">
             Proyecto desarrollado con Django, PostgreSQL y Bootstrap.
         </p>
