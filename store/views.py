@@ -24,7 +24,7 @@ def product_detail(request, pk):
     )
     return render(request, "store/product_detail.html", {"product": product})
 
-
+@login_required
 def add_to_cart(request, pk):
     product = get_object_or_404(Product, pk=pk)
 
@@ -46,7 +46,7 @@ def add_to_cart(request, pk):
 
     return redirect("store:cart_detail")
 
-
+@login_required
 def cart_detail(request):
     cart = request.session.get("cart", {})
     product_ids = cart.keys()
@@ -73,7 +73,7 @@ def cart_detail(request):
     }
     return render(request, "store/cart_detail.html", context)
 
-
+@login_required
 def remove_from_cart(request, pk):
     product = get_object_or_404(Product, pk=pk)
 

@@ -57,6 +57,9 @@ class Order(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="orders",
+        #revisar mas adelante si necesita correccion 
+        null=True,
+        blank=True,
     )
     full_name = models.CharField(max_length=150)
     email = models.EmailField()

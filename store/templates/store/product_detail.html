@@ -46,9 +46,15 @@
                             Volver al catálogo
                         </a>
 
-                        <a href="{% url 'store:add_to_cart' product.pk %}" class="btn btn-dark">
-                            Agregar al carrito
-                        </a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'store:add_to_cart' product.pk %}" class="btn btn-dark">
+                                Agregar al carrito
+                            </a>
+                        {% else %}
+                            <a href="{% url 'users:login' %}?next={% url 'store:product_list' %}" class="btn btn-outline-dark">
+                                Inicia sesión para comprar
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
