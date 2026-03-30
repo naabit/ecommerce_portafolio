@@ -1,19 +1,9 @@
 @charset "UTF-8";
 
-/* RESET */
-html,
-body {
-  margin: 0px;
-  padding: 0px;
-  min-height: 100%;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Helvetica, Arial, sans-serif;
-  scroll-behavior: smooth;
-}
+/* =========================
+   VARIABLES Y BASE
+========================= */
 
-/* Paleta de colores */
 :root {
   --c-chinese-black: #0d0e20;
   --c-persian-indigo: #2d1c7f;
@@ -21,54 +11,52 @@ body {
   --c-vodka: #c8b3f6;
   --c-max-blue-purple: #b0a9e5;
 
-  /* tema claro */
-  --bg: #c8b3f6;
+  --bg: #f3efff;
   --fg: #1f2340;
-  --muted: #b0a9e5;
+  --muted: #6f7390;
   --brand: var(--c-majorelle-blue);
   --brand-2: var(--c-persian-indigo);
-  --btn-on-brand: #f7f7f7;
+  --btn-on-brand: #ffffff;
 
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
 
-  --shadow-soft: 0 6px 24px rgba(0, 0, 0, 0.12);
-  --border: color-mix(in srgb, var(--fg) 14%, transparent);
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 14px 36px rgba(0, 0, 0, 0.14);
+  --border: color-mix(in srgb, var(--fg) 12%, transparent);
 
-  /* superficies */
-  --surface: rgba(255, 255, 255, 0.65);
-  --surface-2: rgba(255, 255, 255, 0.45);
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-2: rgba(255, 255, 255, 0.65);
 
-  /* focus */
-  --focus-ring: 0 0 0 0.25rem color-mix(in srgb, var(--brand) 30%, transparent);
+  --focus-ring: 0 0 0 0.25rem color-mix(in srgb, var(--brand) 28%, transparent);
+
+  --navbar-height: 76px;
 }
 
-/* tema oscuro */
 [data-bs-theme="dark"] {
   --bg: #0d0e20;
-  --fg: #e7e6ff;
-  --muted: #b9b6cf;
+  --fg: #ecebff;
+  --muted: #b4b1d1;
   --brand: var(--c-majorelle-blue);
-  --brand-2: var(--c-persian-indigo);
+  --brand-2: #8d77ff;
 
-  --surface: rgba(13, 14, 32, 0.65);
-  --surface-2: rgba(13, 14, 32, 0.45);
-  --border: color-mix(in srgb, var(--fg) 16%, transparent);
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --surface: rgba(20, 22, 45, 0.88);
+  --surface-2: rgba(20, 22, 45, 0.7);
+  --border: color-mix(in srgb, var(--fg) 14%, transparent);
+  --shadow-soft: 0 12px 32px rgba(0, 0, 0, 0.28);
+  --shadow-medium: 0 18px 42px rgba(0, 0, 0, 0.38);
   --focus-ring: 0 0 0 0.25rem color-mix(in srgb, var(--brand) 35%, transparent);
 }
 
-/* Integración con Bootstrap (variables base) */
+/* Bootstrap variables */
 :root,
 [data-bs-theme="light"] {
   --bs-body-bg: var(--bg);
   --bs-body-color: var(--fg);
   --bs-border-color: var(--border);
-
   --bs-primary: var(--brand);
-  --bs-primary-rgb: 117, 70, 232; /* --c-majorelle-blue */
-
+  --bs-primary-rgb: 117, 70, 232;
   --bs-link-color: var(--brand-2);
   --bs-link-hover-color: var(--brand);
 }
@@ -77,42 +65,109 @@ body {
   --bs-body-bg: var(--bg);
   --bs-body-color: var(--fg);
   --bs-border-color: var(--border);
-
   --bs-link-color: var(--c-vodka);
   --bs-link-hover-color: var(--brand);
 }
 
-/* Fondo general */
-body {
-  background-color: var(--bg);
-  color: var(--fg);
+/* Reset suave */
+html {
+  scroll-behavior: smooth;
 }
 
-/* Espaciados */
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding-top: var(--navbar-height);
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+/* =========================
+   LAYOUT GENERAL
+========================= */
+
+.app-shell {
+  flex: 1;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.app-messages {
+  margin-bottom: 1.5rem;
+}
+
 .page-section {
-  padding-block: 2rem;
+  padding-block: 2.5rem;
 }
 
 .surface {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 }
 
-/* Navbar */
+/* =========================
+   NAVBAR
+========================= */
+
+.app-navbar {
+  min-height: var(--navbar-height);
+}
+
 .bg-indigo {
   background-color: var(--c-persian-indigo) !important;
 }
 
-.navbar .btn.nav-link {
-  color: rgba(255, 255, 255, 0.85);
+.logo-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--c-vodka);
+  margin-right: 0.5rem;
+  flex-shrink: 0;
 }
 
-.navbar .btn.nav-link:hover {
-  color: #fff;
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.88);
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
-/* Botones */
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: #ffffff;
+}
+
+.navbar .nav-link.active {
+  color: var(--c-vodka) !important;
+  font-weight: 600;
+}
+
+.app-nav-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+}
+
+.app-nav-button:hover,
+.app-nav-button:focus {
+  color: #ffffff;
+}
+
+.app-user-greeting {
+  opacity: 0.95;
+}
+
+/* =========================
+   BOTONES
+========================= */
+
 .btn {
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -124,57 +179,59 @@ body {
 
 .btn-outline-brand {
   --bs-btn-color: var(--brand-2);
-  --bs-btn-border-color: color-mix(in srgb, var(--brand-2) 55%, transparent);
-  --bs-btn-hover-bg: color-mix(in srgb, var(--brand) 18%, transparent);
+  --bs-btn-border-color: color-mix(in srgb, var(--brand-2) 45%, transparent);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--brand) 15%, transparent);
   --bs-btn-hover-border-color: color-mix(in srgb, var(--brand) 65%, transparent);
   --bs-btn-hover-color: var(--fg);
-  --bs-btn-active-bg: color-mix(in srgb, var(--brand) 26%, transparent);
+  --bs-btn-active-bg: color-mix(in srgb, var(--brand) 22%, transparent);
   --bs-btn-active-border-color: color-mix(in srgb, var(--brand) 75%, transparent);
   --bs-btn-active-color: var(--fg);
 }
 
 .btn-majorelle {
   background-color: var(--c-majorelle-blue);
+  border-color: var(--c-majorelle-blue);
   color: var(--btn-on-brand);
 }
-.btn-majorelle:hover {
-  filter: brightness(1.05);
+
+.btn-majorelle:hover,
+.btn-majorelle:focus {
+  background-color: color-mix(in srgb, var(--c-majorelle-blue) 88%, black);
+  border-color: color-mix(in srgb, var(--c-majorelle-blue) 88%, black);
+  color: var(--btn-on-brand);
 }
 
 .btn-vodka {
   background-color: var(--c-vodka);
+  border-color: var(--c-vodka);
   color: #1b1440;
 }
-.btn-vodka:hover {
-  filter: brightness(1.05);
+
+.btn-vodka:hover,
+.btn-vodka:focus {
+  background-color: color-mix(in srgb, var(--c-vodka) 92%, white);
+  border-color: color-mix(in srgb, var(--c-vodka) 92%, white);
+  color: #1b1440;
 }
 
-/* Botón carrito */
-.btn-cart {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  padding: 0;
+/* =========================
+   CARRITO FLOTANTE
+========================= */
+
+.floating-cart {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 60px;
+  height: 60px;
   border-radius: 999px;
-  background: var(--c-vodka);
-  color: #1b1440;
-  border: 1px solid color-mix(in srgb, var(--c-persian-indigo) 25%, transparent);
-}
-
-.btn-cart:hover {
-  filter: brightness(1.03);
-}
-
-.btn-cart svg {
-  width: 20px;
-  height: 20px;
+  z-index: 3000;
+  box-shadow: var(--shadow-medium);
 }
 
 .cart-badge {
-  min-width: 20px;
-  height: 20px;
+  min-width: 22px;
+  height: 22px;
   padding: 0 6px;
   display: inline-flex;
   align-items: center;
@@ -183,30 +240,29 @@ body {
   font-size: 0.75rem;
   line-height: 1;
   background: var(--c-chinese-black);
-  color: #fff;
+  color: #ffffff;
+  border: 2px solid #ffffff;
 }
 
-.floating-cart {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  width: 60px;
-  height: 60px;
-  border-radius: 999px;
-  z-index: 3000;
-  box-shadow: var(--shadow-soft);
+/* =========================
+   FOOTER
+========================= */
+
+.app-footer {
+  margin-top: 3rem;
 }
 
-/* Footer oscuro */
 .bg-chinese {
   background-color: var(--c-chinese-black) !important;
 }
 
-/* BotÃ³n de cambio de tema */
+/* =========================
+   TEMA
+========================= */
+
 #themeToggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  min-width: 38px;
+  min-height: 38px;
   padding: 0.25rem 0.5rem;
   line-height: 1;
 }
@@ -217,36 +273,33 @@ body {
   display: block;
 }
 
-/* Gradiente hero */
+/* =========================
+   HERO / ELEMENTOS VISUALES
+========================= */
+
 .bg-gradient-hero {
   background: linear-gradient(
     135deg,
     var(--c-majorelle-blue),
     var(--c-persian-indigo)
   );
+  color: #ffffff;
 }
 
-/* Logo */
-.logo-dot {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: var(--c-vodka);
-  margin-right: 0.35rem;
-  vertical-align: middle;
-}
+/* =========================
+   CARDS
+========================= */
 
-/* Cards */
 .card {
   border: 1px solid var(--border);
-  transition: transform 0.15s ease, box-shadow 0.3s ease;
+  border-radius: var(--radius-lg);
   background-color: var(--surface);
   color: var(--fg);
-  border-radius: var(--radius-lg);
+  transition: transform 0.18s ease, box-shadow 0.25s ease;
 }
+
 .card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-soft);
 }
 
@@ -255,7 +308,6 @@ body {
   height: 200px;
 }
 
-/* Badge precio */
 .badge-price {
   background: var(--c-max-blue-purple);
   color: #1f1a3a;
@@ -267,38 +319,20 @@ body {
   border: 1px solid color-mix(in srgb, var(--c-persian-indigo) 18%, transparent);
 }
 
-/* Scroll margin para anclas */
-#productos {
-  scroll-margin-top: 90px;
-}
+/* =========================
+   ALERTAS
+========================= */
 
-/* Ajustes responsive */
-@media (max-width: 575.98px) {
-  .cart-item {
-    align-items: flex-start;
-  }
-
-  .cart-item img {
-    margin-bottom: 0.5rem;
-  }
-
-  .cart-item .fw-bold {
-    font-size: 0.9rem;
-  }
-}
-
-/* Navbar active link */
-.navbar .nav-link.active {
-  color: var(--c-vodka) !important;
-  font-weight: 500;
-}
-
-/* Alertas con estilo */
 .alert {
-  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
 }
 
-/* Formularios */
+/* =========================
+   FORMULARIOS
+========================= */
+
 .form-control,
 .form-select,
 .form-check-input {
@@ -326,4 +360,56 @@ body {
 .form-check-input:checked {
   background-color: var(--brand);
   border-color: var(--brand);
+}
+
+/* =========================
+   OFFCANVAS / LISTAS
+========================= */
+
+.offcanvas,
+.list-group-item {
+  background-color: var(--surface);
+  color: var(--fg);
+  border-color: var(--border);
+}
+
+/* =========================
+   ANCLAS Y DETALLES
+========================= */
+
+#productos {
+  scroll-margin-top: 100px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 991.98px) {
+  .navbar .navbar-nav.ms-auto {
+    margin-top: 0.75rem;
+  }
+
+  #themeToggle {
+    margin-top: 0.25rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .app-shell {
+    padding-top: 0.5rem;
+  }
+
+  .floating-cart {
+    right: 16px;
+    bottom: 16px;
+    width: 56px;
+    height: 56px;
+  }
+
+  .cart-badge {
+    min-width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
 }

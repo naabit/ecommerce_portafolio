@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}404 | Purple Store{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container text-center">
+        <img
+            src="{% static 'img/404.png' %}"
+            alt="Pagina no encontrada"
+            class="img-fluid"
+            style="max-height: 420px;"
+        >
+
+        <h1 class="h3 mt-4">Pagina no encontrada</h1>
+        <p class="text-muted mb-4">
+            La URL que buscas no existe o fue movida.
+        </p>
+
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <a class="btn btn-majorelle" href="{% url 'core:home' %}">Ir al inicio</a>
+            <a class="btn btn-outline-brand" href="{% url 'store:product_list' %}">Ver catalogo</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
