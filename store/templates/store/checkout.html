@@ -1,10 +1,10 @@
-{% extends "core/base.html" %}
+{% extends "base.html" %}
 {% load humanize %}
 
-{% block title %}Checkout | Ecommerce{% endblock %}
+{% block title %}Checkout | Purple Store{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<section class="page-section">
     <div class="mb-4">
         <h1 class="h2 mb-1">Finalizar compra</h1>
         <p class="text-muted mb-0">
@@ -14,7 +14,7 @@
 
     <div class="row g-4">
         <div class="col-lg-7">
-            <div class="card shadow-sm border-0">
+            <div class="card">
                 <div class="card-body p-4">
                     <h2 class="h4 mb-3">Datos de compra</h2>
 
@@ -76,10 +76,10 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="{% url 'store:cart_detail' %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'store:cart_detail' %}" class="btn btn-outline-brand">
                                 Volver al carrito
                             </a>
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-majorelle">
                                 Confirmar compra
                             </button>
                         </div>
@@ -89,14 +89,14 @@
         </div>
 
         <div class="col-lg-5">
-            <div class="card shadow-sm border-0">
+            <div class="card">
                 <div class="card-body p-4">
                     <h2 class="h4 mb-3">Resumen del pedido</h2>
 
                     {% if cart_items %}
                         <div class="list-group list-group-flush mb-3">
                             {% for item in cart_items %}
-                                <div class="list-group-item px-0">
+                                <div class="list-group-item px-0 bg-transparent">
                                     <div class="d-flex justify-content-between gap-3">
                                         <div>
                                             <h3 class="h6 mb-1">{{ item.product.name }}</h3>
@@ -116,7 +116,9 @@
 
                         <div class="d-flex justify-content-between align-items-center border-top pt-3">
                             <span class="fw-bold">Total</span>
-                            <span class="fw-bold fs-5">${{ total|floatformat:0|intcomma }}</span>
+                            <span class="badge badge-price fs-6">
+                                ${{ total|floatformat:0|intcomma }}
+                            </span>
                         </div>
                     {% else %}
                         <p class="text-muted mb-0">Tu carrito está vacío.</p>
@@ -125,5 +127,5 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

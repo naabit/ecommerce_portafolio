@@ -1,18 +1,19 @@
-{% extends "core/base.html" %}
+{% extends "base.html" %}
+{% load humanize %}
 
-{% block title %}Carrito | Ecommerce{% endblock %}
+{% block title %}Carrito | Purple Store{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="page-section">
+    <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-4">
         <h1 class="h2 mb-0">Tu carrito</h1>
-        <a href="{% url 'store:product_list' %}" class="btn btn-outline-secondary">
+        <a href="{% url 'store:product_list' %}" class="btn btn-outline-brand">
             Seguir comprando
         </a>
     </div>
 
     {% if cart_items %}
-        <div class="card shadow-sm border-0">
+        <div class="card">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
@@ -23,7 +24,6 @@
                                 <th>Cantidad</th>
                                 <th>Subtotal</th>
                                 <th class="text-end">Acciones</th>
-                        
                             </tr>
                         </thead>
                         <tbody>
@@ -35,14 +35,13 @@
                                             <small class="text-muted">{{ item.product.category.name }}</small>
                                         {% endif %}
                                     </td>
-                                    <td>${{ item.product.price }}</td>
+                                    <td>${{ item.product.price|floatformat:0|intcomma }}</td>
                                     <td>{{ item.quantity }}</td>
-                                    <td>${{ item.subtotal }}</td>
+                                    <td>${{ item.subtotal|floatformat:0|intcomma }}</td>
                                     <td class="text-end">
                                         <a href="{% url 'store:remove_from_cart' item.product.pk %}" class="btn btn-sm btn-outline-danger">
                                             Quitar
                                         </a>
-                                        
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -50,30 +49,34 @@
                         <tfoot>
                             <tr>
                                 <th colspan="3" class="text-end">Total</th>
-                                <th>${{ total }}</th>
+                                <th>${{ total|floatformat:0|intcomma }}</th>
                                 <th></th>
-                                
                             </tr>
                         </tfoot>
                     </table>
-                                <a href="{% url 'store:checkout' %}" class="btn btn-success">
-                                    Finalizar compra
-                                </a>
+                </div>
+            </div>
+
+            <div class="card-footer bg-transparent border-0 p-3">
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'store:checkout' %}" class="btn btn-majorelle">
+                        Finalizar compra
+                    </a>
                 </div>
             </div>
         </div>
     {% else %}
-        <div class="card shadow-sm border-0">
+        <div class="card">
             <div class="card-body p-5 text-center">
                 <h2 class="h4 mb-3">Tu carrito está vacío</h2>
                 <p class="text-muted mb-4">
                     Aún no has agregado productos.
                 </p>
-                <a href="{% url 'store:product_list' %}" class="btn btn-dark">
+                <a href="{% url 'store:product_list' %}" class="btn btn-majorelle">
                     Ir al catálogo
                 </a>
             </div>
         </div>
     {% endif %}
-</div>
+</section>
 {% endblock %}

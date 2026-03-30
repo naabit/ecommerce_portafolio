@@ -1,16 +1,20 @@
-{% extends "core/base.html" %}
+{% extends "base.html" %}
 
-{% block title %}Acerca de | Ecommerce{% endblock %}
+{% block title %}Acerca de | Purple Store{% endblock %}
 
 {% block content %}
-<div class="bg-white p-4 rounded-3 shadow-sm border">
-    <h1 class="h3 mb-3">Acerca de este proyecto</h1>
-    <p>
-        Este ecommerce fue desarrollado como proyecto de portafolio utilizando Django,
-        Bootstrap y base de datos relacional.
-    </p>
-    <p class="mb-0">
-        Incluye catálogo, carrito, checkout y autenticación de usuarios.
-    </p>
-</div>
+<section class="page-section">
+    <div class="card">
+        <div class="card-body p-4">
+            <h1 class="h3 mb-3">Acerca de este proyecto</h1>
+            <p class="mb-2">
+                Este ecommerce fue desarrollado como proyecto de portafolio utilizando Django,
+                Bootstrap y base de datos relacional.
+            </p>
+            <p class="text-muted mb-0">
+                Incluye catálogo, carrito, checkout y autenticación de usuarios.
+            </p>
+        </div>
+    </div>
+</section>
 {% endblock %}

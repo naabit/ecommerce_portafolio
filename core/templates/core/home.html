@@ -1,35 +1,40 @@
-{% extends "core/base.html" %}
+{% extends "base.html" %}
 
-{% block title %}Inicio | Ecommerce{% endblock %}
+{% block title %}Inicio | Purple Store{% endblock %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
-    <div class="container-fluid py-4">
-        <h1 class="display-5 fw-bold">Bienvenida a tu Ecommerce</h1>
-            {% if user.is_authenticated %}
-        <p class="text-muted">
-            Sesión iniciada como:
-            {% if user.is_superuser %}
-                Administrador
-            {% elif user.is_staff %}
-                Staff
-            {% else %}
-                Cliente
-            {% endif %}
-        </p>
-    {% endif %}
-        <p class="col-md-8 fs-5">
-            Proyecto desarrollado con Django, PostgreSQL y Bootstrap.
-        </p>
-        <p class="text-muted mb-4">
-            Ya cuenta con catálogo, carrito, checkout y persistencia en base de datos.
-            Ahora estamos incorporando autenticación de usuarios.
-        </p>
+<section class="page-section">
+    <div class="card">
+        <div class="card-body p-4 p-md-5">
+            <h1 class="display-6 fw-bold mb-2">Bienvenida a tu Ecommerce</h1>
 
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="{% url 'store:product_list' %}" class="btn btn-dark">Ver catálogo</a>
-            <a href="/admin/" class="btn btn-outline-secondary">Panel admin</a>
+            {% if user.is_authenticated %}
+                <p class="text-muted mb-3">
+                    Sesión iniciada como:
+                    {% if user.is_superuser %}
+                        Administrador
+                    {% elif user.is_staff %}
+                        Staff
+                    {% else %}
+                        Cliente
+                    {% endif %}
+                </p>
+            {% endif %}
+
+            <p class="fs-5 mb-1">
+                Proyecto desarrollado con Django, PostgreSQL y Bootstrap.
+            </p>
+            <p class="text-muted mb-4">
+                Incluye catálogo, carrito, checkout y autenticación de usuarios.
+            </p>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'store:product_list' %}" class="btn btn-majorelle">Ver catálogo</a>
+                {% if user.is_staff %}
+                    <a href="/admin/" class="btn btn-outline-brand">Panel admin</a>
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
