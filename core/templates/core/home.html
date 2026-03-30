@@ -4,35 +4,111 @@
 
 {% block content %}
 <section class="page-section">
-    <div class="card">
-        <div class="card-body p-4 p-md-5">
-            <h1 class="display-6 fw-bold mb-2">Bienvenida a tu Ecommerce</h1>
+    <div class="p-5 rounded-4 bg-gradient-hero text-white shadow-sm">
+        <div class="container-fluid py-3">
+            <span class="badge bg-light text-dark mb-3">Proyecto final · Django e-commerce</span>
 
-            {% if user.is_authenticated %}
-                <p class="text-muted mb-3">
-                    Sesión iniciada como:
-                    {% if user.is_superuser %}
-                        Administrador
-                    {% elif user.is_staff %}
-                        Staff
-                    {% else %}
-                        Cliente
-                    {% endif %}
-                </p>
-            {% endif %}
+            <h1 class="display-5 fw-bold mb-3">Purple Store</h1>
 
-            <p class="fs-5 mb-1">
-                Proyecto desarrollado con Django, PostgreSQL y Bootstrap.
-            </p>
-            <p class="text-muted mb-4">
-                Incluye catálogo, carrito, checkout y autenticación de usuarios.
+            <p class="col-lg-8 fs-5 mb-4">
+                Un e-commerce desarrollado con Django que integra catálogo dinámico,
+                autenticación de usuarios, carrito de compras y flujo de checkout
+                con persistencia en base de datos.
             </p>
 
-            <div class="d-flex gap-2 flex-wrap">
-                <a href="{% url 'store:product_list' %}" class="btn btn-majorelle">Ver catálogo</a>
-                {% if user.is_staff %}
-                    <a href="/admin/" class="btn btn-outline-brand">Panel admin</a>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'store:product_list' %}" class="btn btn-light btn-lg">
+                    Ver catálogo
+                </a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'store:cart_detail' %}" class="btn btn-outline-light btn-lg">
+                        Ir al carrito
+                    </a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="btn btn-outline-light btn-lg">
+                        Iniciar sesión
+                    </a>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="page-section">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">Catálogo dinámico</h2>
+                    <p class="text-muted mb-0">
+                        Los productos se cargan desde la base de datos y se presentan
+                        en una interfaz clara, escalable y fácil de recorrer.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">Carrito y checkout</h2>
+                    <p class="text-muted mb-0">
+                        El proyecto incluye un flujo completo de compra: agregar productos,
+                        revisar subtotales, confirmar pedido y registrar la orden.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">Usuarios y roles</h2>
+                    <p class="text-muted mb-0">
+                        Se implementa autenticación con acceso diferenciado para clientes,
+                        personal staff y administración del sistema.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="page-section">
+    <div class="card shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-7">
+                    <h2 class="h4 mb-3">¿Qué demuestra este proyecto?</h2>
+                    <p class="text-muted mb-3">
+                        Purple Store fue desarrollado como proyecto de portafolio para integrar
+                        distintas capas de una aplicación web real: backend con Django,
+                        persistencia con ORM, autenticación, vistas, templates y una interfaz
+                        responsiva construida con Bootstrap.
+                    </p>
+                    <p class="text-muted mb-0">
+                        El foco del proyecto está en ofrecer una experiencia funcional, clara
+                        y mantenible, siguiendo una estructura modular por aplicaciones.
+                    </p>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="surface p-4 h-100">
+                        <h3 class="h6 text-uppercase mb-3">Tecnologías utilizadas</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge badge-soft">Python</span>
+                            <span class="badge badge-soft">Django</span>
+                            <span class="badge badge-soft">Bootstrap 5</span>
+                            <span class="badge badge-soft">HTML</span>
+                            <span class="badge badge-soft">CSS</span>
+                            <span class="badge badge-soft">JavaScript</span>
+                            <span class="badge badge-soft">ORM</span>
+                            <span class="badge badge-soft">Autenticación</span>
+                            <span class="badge badge-soft">Checkout</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

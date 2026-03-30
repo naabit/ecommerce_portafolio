@@ -3,6 +3,8 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
 
 from .forms import CheckoutForm
 from .models import OrderItem, Product
@@ -30,25 +32,65 @@ def product_detail(request, pk):
 # =========================
 
 @login_required
+@require_POST
 def add_to_cart(request, pk):
     product = get_object_or_404(Product, pk=pk)
 
     cart = request.session.get("cart", {})
     product_id = str(product.pk)
-    current_quantity = cart.get(product_id, 0)
 
-    if current_quantity < product.stock:
-        cart[product_id] = current_quantity + 1
+    try:
+        current_quantity = int(cart.get(product_id, 0) or 0)
+    except (TypeError, ValueError):
+        current_quantity = 0
+
+    raw_quantity = request.POST.get("quantity", "1")
+    try:
+        quantity_to_add = int(raw_quantity)
+    except (TypeError, ValueError):
+        quantity_to_add = 0
+
+    if quantity_to_add < 1:
+        messages.error(request, "Selecciona una cantidad válida.")
+        return _safe_redirect_back(request, fallback_url="store:product_list")
+
+    if product.stock < 1:
+        messages.warning(request, f'"{product.name}" no tiene stock disponible.')
+        return _safe_redirect_back(request, fallback_url="store:product_list")
+
+    available_to_add = max(int(product.stock) - current_quantity, 0)
+
+    if quantity_to_add <= available_to_add:
+        cart[product_id] = current_quantity + quantity_to_add
         request.session["cart"] = cart
         request.session.modified = True
-        messages.success(request, f'"{product.name}" fue agregado al carrito.')
+        if quantity_to_add == 1:
+            messages.success(request, f'"{product.name}" fue agregado correctamente al carrito.')
+        else:
+            messages.success(
+                request,
+                f'Se agregaron {quantity_to_add} unidades de "{product.name}" correctamente al carrito.',
+            )
     else:
         messages.warning(
             request,
-            f'No puedes agregar más unidades de "{product.name}" porque supera el stock disponible.',
+            f'No se pudo agregar "{product.name}". Stock disponible para agregar: {available_to_add}.',
         )
 
-    return redirect("store:cart_detail")
+    return _safe_redirect_back(request, fallback_url="store:product_list")
+
+
+def _safe_redirect_back(request, fallback_url: str):
+    next_url = request.POST.get("next") or request.META.get("HTTP_REFERER")
+
+    if next_url and url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect(next_url)
+
+    return redirect(fallback_url)
 
 
 @login_required
@@ -62,7 +104,11 @@ def cart_detail(request):
     total = Decimal("0")
 
     for product in products:
-        quantity = cart.get(str(product.id), 0)
+        try:
+            quantity = int(cart.get(str(product.id), 0) or 0)
+        except (TypeError, ValueError):
+            quantity = 0
+
         subtotal = product.price * quantity
         total += subtotal
 
@@ -77,6 +123,56 @@ def cart_detail(request):
         "total": total,
     }
     return render(request, "store/cart_detail.html", context)
+
+
+@login_required
+@require_POST
+def update_cart_item(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    cart = request.session.get("cart", {})
+    product_id = str(product.pk)
+
+    try:
+        current_quantity = int(cart.get(product_id, 0) or 0)
+    except (TypeError, ValueError):
+        current_quantity = 0
+
+    raw_delta = request.POST.get("delta")
+    if raw_delta is not None:
+        try:
+            delta = int(raw_delta)
+        except (TypeError, ValueError):
+            delta = 0
+        new_quantity = current_quantity + delta
+    else:
+        raw_quantity = request.POST.get("quantity", "")
+        try:
+            new_quantity = int(raw_quantity)
+        except (TypeError, ValueError):
+            new_quantity = -1
+
+    if new_quantity < 1:
+        if product_id in cart:
+            del cart[product_id]
+            request.session["cart"] = cart
+            request.session.modified = True
+            messages.info(request, f'"{product.name}" fue eliminado del carrito.')
+        return redirect("store:cart_detail")
+
+    if product.stock < new_quantity:
+        messages.warning(
+            request,
+            f'No se pudo actualizar "{product.name}". Stock disponible: {int(product.stock)}.',
+        )
+        return redirect("store:cart_detail")
+
+    cart[product_id] = new_quantity
+    request.session["cart"] = cart
+    request.session.modified = True
+    messages.success(request, f'"{product.name}" se actualizó correctamente.')
+
+    return redirect("store:cart_detail")
 
 
 @login_required

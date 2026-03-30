@@ -11,9 +11,10 @@ urlpatterns = [
     # carrito
     path("carrito/", views.cart_detail, name="cart_detail"),
     path("carrito/agregar/<int:pk>/", views.add_to_cart, name="add_to_cart"),
+    path("carrito/actualizar/<int:pk>/", views.update_cart_item, name="update_cart_item"),
     path("carrito/quitar/<int:pk>/", views.remove_from_cart, name="remove_from_cart"),
 
     # checkout
     path("checkout/", views.checkout, name="checkout"),
-    path("checkout/exito/", views.checkout_success, name="checkout_success"),
+    path("checkout/exito/<int:order_id>/", views.checkout_success, name="checkout_success"),
 ]

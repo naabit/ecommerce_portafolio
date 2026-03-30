@@ -36,7 +36,42 @@
                                         {% endif %}
                                     </td>
                                     <td>${{ item.product.price|floatformat:0|intcomma }}</td>
-                                    <td>{{ item.quantity }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <form method="post" action="{% url 'store:update_cart_item' item.product.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="delta" value="-1">
+                                                <button type="submit" class="btn btn-outline-brand btn-sm" aria-label="Disminuir cantidad">
+                                                    −
+                                                </button>
+                                            </form>
+
+                                            <form method="post" action="{% url 'store:update_cart_item' item.product.pk %}" class="d-inline-flex align-items-center gap-2">
+                                                {% csrf_token %}
+                                                <label for="qty-cart-{{ item.product.pk }}" class="visually-hidden">Cantidad</label>
+                                                <input
+                                                    id="qty-cart-{{ item.product.pk }}"
+                                                    name="quantity"
+                                                    type="number"
+                                                    class="form-control form-control-sm"
+                                                    value="{{ item.quantity }}"
+                                                    min="1"
+                                                    max="{{ item.product.stock }}"
+                                                    style="width: 90px;"
+                                                >
+
+                                            </form>
+
+                                            <form method="post" action="{% url 'store:update_cart_item' item.product.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="delta" value="1">
+                                                <button type="submit" class="btn btn-outline-brand btn-sm" aria-label="Aumentar cantidad">
+                                                    +
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="small text-muted mt-1">Stock: {{ item.product.stock }}</div>
+                                    </td>
                                     <td>${{ item.subtotal|floatformat:0|intcomma }}</td>
                                     <td class="text-end">
                                         <a href="{% url 'store:remove_from_cart' item.product.pk %}" class="btn btn-sm btn-outline-danger">

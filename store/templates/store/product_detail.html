@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load humanize static %}
 
 {% block title %}{{ product.name }} | Purple Store{% endblock %}
 
@@ -8,13 +8,13 @@
     <div class="row g-4">
         <div class="col-md-6">
             <div class="card h-100">
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 350px;">
-                {% else %}
-                    <div class="d-flex align-items-center justify-content-center" style="height: 350px;">
-                        <span class="text-muted">Imagen no disponible</span>
-                    </div>
-                {% endif %}
+                <img
+                    src="{% if product.image %}{{ product.image }}{% else %}{% static 'img/no_image.png' %}{% endif %}"
+                    class="card-img-top"
+                    alt="{{ product.name }}"
+                    style="height: 350px; object-fit: contain;"
+                    onerror="this.onerror=null;this.src='{% static 'img/no_image.png' %}';"
+                >
             </div>
         </div>
 
@@ -46,9 +46,57 @@
                         </a>
 
                         {% if user.is_authenticated %}
-                            <a href="{% url 'store:add_to_cart' product.pk %}" class="btn btn-majorelle">
-                                Agregar al carrito
-                            </a>
+                            <form
+                                method="post"
+                                action="{% url 'store:add_to_cart' product.pk %}"
+                                class="d-flex gap-2 align-items-center flex-wrap"
+                            >
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="qty-{{ product.pk }}" class="form-label mb-0 small text-muted">
+                                        Cantidad
+                                    </label>
+                                    <input
+                                        id="qty-{{ product.pk }}"
+                                        name="quantity"
+                                        type="number"
+                                        class="form-control"
+                                        value="1"
+                                        min="1"
+                                        max="{{ product.stock }}"
+                                        style="width: 110px;"
+                                        {% if product.stock < 1 %}disabled{% endif %}
+                                    >
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-majorelle d-inline-flex align-items-center justify-content-center"
+                                    aria-label="Agregar al carrito"
+                                    {% if product.stock < 1 %}disabled{% endif %}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        width="22"
+                                        height="22"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218
+                                            c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6
+                                            20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                                        />
+                                    </svg>
+                                </button>
+                            </form>
                         {% else %}
                             <a href="{% url 'users:login' %}?next={% url 'store:product_detail' product.pk %}" class="btn btn-outline-brand">
                                 Inicia sesión para comprar

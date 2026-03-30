@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import logout, login
+from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.views import View
@@ -32,7 +33,10 @@ def register(request):
         if form.is_valid():
             user = form.save()
 
-            login(request, user)  # login automático
+            grupo_cliente, _ = Group.objects.get_or_create(name="cliente")
+            user.groups.add(grupo_cliente)
+
+            login(request, user)
             messages.success(request, "Cuenta creada correctamente.")
 
             return redirect("core:home")
