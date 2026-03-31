@@ -363,6 +363,70 @@ body {
 }
 
 /* =========================
+   FILTROS / CATÁLOGO
+========================= */
+
+.filter-bar {
+  backdrop-filter: blur(10px);
+}
+
+.filter-bar .form-label {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.filter-bar--minimal {
+  padding: 0.9rem;
+  background: var(--surface-2);
+  box-shadow: none;
+  border-radius: var(--radius-lg);
+}
+
+.filter-bar--minimal .form-control,
+.filter-bar--minimal .form-select {
+  background-color: rgba(255, 255, 255, 0.55);
+}
+
+[data-bs-theme="dark"] .filter-bar--minimal .form-control,
+[data-bs-theme="dark"] .filter-bar--minimal .form-select {
+  background-color: rgba(20, 22, 45, 0.62);
+}
+
+.filter-bar__details {
+  position: relative;
+}
+
+.filter-bar__summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0.15rem 0.25rem;
+  border-radius: var(--radius-sm);
+}
+
+.filter-bar__summary:hover,
+.filter-bar__summary:focus {
+  color: var(--fg);
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+}
+
+.filter-bar__summary::-webkit-details-marker {
+  display: none;
+}
+
+.filter-bar__details-body {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  min-width: 220px;
+}
+
+/* =========================
    OFFCANVAS / LISTAS
 ========================= */
 

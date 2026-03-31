@@ -1,4 +1,12 @@
+"""
+Context processors de la app `store`.
+
+Se utilizan para exponer datos del carrito a los templates,
+incluyendo un contador global y una vista previa para el offcanvas.
+"""
+
 def cart_item_count(request):
+    """Agrega `cart_item_count` y (opcionalmente) un preview del carrito al contexto."""
     cart = request.session.get("cart", {}) or {}
 
     try:
@@ -13,7 +21,8 @@ def cart_item_count(request):
     if not getattr(request, "user", None) or not request.user.is_authenticated:
         return context
 
-    # Vista previa para el offcanvas del carrito
+    # Vista previa para el offcanvas del carrito.
+    # Importamos aquí para evitar costos/ciclos de import en requests anónimos.
     from decimal import Decimal
     from .models import Product
 

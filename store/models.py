@@ -1,9 +1,17 @@
+"""
+Modelos principales del e-commerce.
+
+- `Category` y `Product` alimentan el catÃ¡logo.
+- `Order` y `OrderItem` persisten compras confirmadas.
+"""
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.conf import settings
 
 
 def _sentence_case(value: str) -> str:
+    # Helper reutilizable para normalizar strings ingresadas por el usuario.
     value = (value or "").strip()
     if not value:
         return value
@@ -11,6 +19,8 @@ def _sentence_case(value: str) -> str:
     return lowered[0].upper() + lowered[1:]
 
 class Category(models.Model):
+    """Agrupa productos para navegacion en el catalogo."""
+
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
 
@@ -24,6 +34,8 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    """Producto vendible mostrado en el catalogo."""
+
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
@@ -53,11 +65,15 @@ class Product(models.Model):
         return f"{self.name} - ${self.price}"
     
 class Order(models.Model):
+    """Orden de compra confirmada (checkout completado)."""
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="orders",
-        #revisar mas adelante si necesita correccion 
+        # Se permite null/blank por simplicidad (por ejemplo, si en el futuro
+        # se habilita checkout como invitado). En el flujo actual se asigna
+        # siempre el usuario autenticado.
         null=True,
         blank=True,
     )
@@ -66,7 +82,8 @@ class Order(models.Model):
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_completed = models.BooleanField(default=True)
+    # Se marca True solo cuando el checkout termina correctamente.
+    is_completed = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Orden"
@@ -74,14 +91,18 @@ class Order(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Orden #{self.id} - {self.user.username}"
+        username = getattr(self.user, "username", None) or "anonimo"
+        return f"Orden #{self.id} - {username}"
 
     @property
     def total(self):
+        """Total calculado como suma de subtotales de sus i­tems."""
         return sum(item.subtotal for item in self.items.all())
 
 
 class OrderItem(models.Model):
+    """Detalle de un producto comprado dentro de una orden."""
+
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,

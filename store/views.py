@@ -1,13 +1,26 @@
-from decimal import Decimal
+"""
+Vistas de la app `store`.
+
+Incluye:
+- Catalogo (lista/detalle).
+- Carrito basado en sesion.
+- Checkout + confirmacion, persistiendo ordenes en DB.
+
+Estructura del carrito en sesion:
+    request.session["cart"] = {"<product_id>": <quantity>, ...}
+"""
+
+from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .forms import CheckoutForm
-from .models import OrderItem, Product
+from .models import Category, OrderItem, Product
 
 
 # =========================
@@ -15,13 +28,90 @@ from .models import OrderItem, Product
 # =========================
 
 def product_list(request):
-    products = Product.objects.select_related("category").all()
-    return render(request, "store/product_list.html", {"products": products})
+    # Solo mostramos productos activos en el catálogo público.
+    products = Product.objects.select_related("category").filter(is_active=True)
+
+    categories = (
+        Category.objects.filter(products__is_active=True)
+        .distinct()
+        .order_by("name")
+    )
+
+    raw_q = (request.GET.get("q") or "").strip()
+    raw_category = (request.GET.get("category") or "").strip()
+    raw_min_price = (request.GET.get("min_price") or "").strip()
+    raw_max_price = (request.GET.get("max_price") or "").strip()
+    raw_sort = (request.GET.get("sort") or "").strip()
+    raw_in_stock = (request.GET.get("in_stock") or "").strip()
+
+    filters = {
+        "q": raw_q,
+        "category": None,
+        "min_price": raw_min_price,
+        "max_price": raw_max_price,
+        "sort": raw_sort,
+        "in_stock": raw_in_stock.lower() in {"1", "true", "on", "yes"},
+    }
+
+    if raw_q:
+        products = products.filter(
+            Q(name__icontains=raw_q)
+            | Q(description__icontains=raw_q)
+            | Q(category__name__icontains=raw_q)
+        )
+
+    if raw_category:
+        try:
+            filters["category"] = int(raw_category)
+            products = products.filter(category_id=filters["category"])
+        except (TypeError, ValueError):
+            filters["category"] = None
+
+    def _parse_price(raw_value: str):
+        try:
+            value = Decimal(raw_value)
+        except (InvalidOperation, TypeError, ValueError):
+            return None
+        if value < 0:
+            return None
+        return value
+
+    min_price = _parse_price(raw_min_price) if raw_min_price else None
+    max_price = _parse_price(raw_max_price) if raw_max_price else None
+    if min_price is not None and max_price is not None and min_price > max_price:
+        min_price, max_price = max_price, min_price
+
+    if min_price is not None:
+        products = products.filter(price__gte=min_price)
+    if max_price is not None:
+        products = products.filter(price__lte=max_price)
+
+    if filters["in_stock"]:
+        products = products.filter(stock__gt=0)
+
+    sort_map = {
+        "name_asc": "name",
+        "name_desc": "-name",
+        "price_asc": "price",
+        "price_desc": "-price",
+        "newest": "-created_at",
+    }
+    sort_field = sort_map.get(raw_sort)
+    if sort_field:
+        products = products.order_by(sort_field)
+
+    context = {
+        "products": products,
+        "categories": categories,
+        "filters": filters,
+    }
+    return render(request, "store/product_list.html", context)
 
 
 def product_detail(request, pk):
     product = get_object_or_404(
-        Product.objects.select_related("category"),
+        # Evita accesos directos a productos "desactivados" desde URL.
+        Product.objects.select_related("category").filter(is_active=True),
         pk=pk,
     )
     return render(request, "store/product_detail.html", {"product": product})
@@ -34,8 +124,9 @@ def product_detail(request, pk):
 @login_required
 @require_POST
 def add_to_cart(request, pk):
-    product = get_object_or_404(Product, pk=pk)
+    product = get_object_or_404(Product, pk=pk, is_active=True)
 
+    # Carrito = diccionario en sesiÃ³n (id_producto -> cantidad)
     cart = request.session.get("cart", {})
     product_id = str(product.pk)
 
@@ -58,6 +149,7 @@ def add_to_cart(request, pk):
         messages.warning(request, f'"{product.name}" no tiene stock disponible.')
         return _safe_redirect_back(request, fallback_url="store:product_list")
 
+    # Evita que la suma en el carrito supere el stock actual del producto.
     available_to_add = max(int(product.stock) - current_quantity, 0)
 
     if quantity_to_add <= available_to_add:
@@ -81,6 +173,12 @@ def add_to_cart(request, pk):
 
 
 def _safe_redirect_back(request, fallback_url: str):
+    """
+    Redirige de forma segura a una URL entregada por el cliente.
+
+    Se usa para volver al catalogo/detalle sin aceptar redirecciones abiertas
+    (open redirect). Si `next`/referer no es valido, cae al `fallback_url`.
+    """
     next_url = request.POST.get("next") or request.META.get("HTTP_REFERER")
 
     if next_url and url_has_allowed_host_and_scheme(
@@ -98,7 +196,26 @@ def cart_detail(request):
     cart = request.session.get("cart", {})
     product_ids = cart.keys()
 
-    products = Product.objects.filter(id__in=product_ids).select_related("category")
+    # Si un producto se desactiva, lo ocultamos del carrito para evitar compras
+    # de productos no disponibles publicamente.
+    products = (
+        Product.objects.filter(id__in=product_ids, is_active=True)
+        .select_related("category")
+    )
+
+    # Limpieza del carrito: elimina ids inexistentes/inactivos para evitar
+    # inconsistencias entre la sesion y lo que se muestra en pantalla.
+    active_ids = {str(product.id) for product in products}
+    removed_ids = [product_id for product_id in list(cart.keys()) if product_id not in active_ids]
+    if removed_ids:
+        for product_id in removed_ids:
+            cart.pop(product_id, None)
+        request.session["cart"] = cart
+        request.session.modified = True
+        messages.info(
+            request,
+            "Se removieron del carrito algunos productos que ya no estan disponibles.",
+        )
 
     cart_items = []
     total = Decimal("0")
@@ -128,7 +245,7 @@ def cart_detail(request):
 @login_required
 @require_POST
 def update_cart_item(request, pk):
-    product = get_object_or_404(Product, pk=pk)
+    product = get_object_or_404(Product, pk=pk, is_active=True)
 
     cart = request.session.get("cart", {})
     product_id = str(product.pk)
@@ -160,6 +277,7 @@ def update_cart_item(request, pk):
             messages.info(request, f'"{product.name}" fue eliminado del carrito.')
         return redirect("store:cart_detail")
 
+    # Validacion de stock contra la cantidad solicitada.
     if product.stock < new_quantity:
         messages.warning(
             request,
@@ -176,8 +294,9 @@ def update_cart_item(request, pk):
 
 
 @login_required
+@require_POST
 def remove_from_cart(request, pk):
-    product = get_object_or_404(Product, pk=pk)
+    product = get_object_or_404(Product, pk=pk, is_active=True)
 
     cart = request.session.get("cart", {})
     product_id = str(product.pk)
@@ -206,17 +325,57 @@ def checkout(request):
     cart_items = []
     total = Decimal("0")
 
+    # Resolucion en bloque de productos activos (evita 404 si el carrito quedó viejo).
+    normalized_ids = []
+    for raw_id in cart.keys():
+        try:
+            normalized_ids.append(int(raw_id))
+        except (TypeError, ValueError):
+            continue
+
+    products = Product.objects.filter(id__in=normalized_ids, is_active=True)
+    product_map = {str(product.id): product for product in products}
+
+    removed_ids = []
     for product_id, quantity in cart.items():
-        product = get_object_or_404(Product, pk=product_id)
-        quantity = int(quantity)
+        product = product_map.get(str(product_id))
+        if not product:
+            removed_ids.append(str(product_id))
+            continue
+
+        try:
+            quantity = int(quantity)
+        except (TypeError, ValueError):
+            removed_ids.append(str(product_id))
+            continue
+
+        if quantity < 1:
+            removed_ids.append(str(product_id))
+            continue
+
         subtotal = product.price * quantity
         total += subtotal
 
-        cart_items.append({
-            "product": product,
-            "quantity": quantity,
-            "subtotal": subtotal,
-        })
+        cart_items.append(
+            {
+                "product": product,
+                "quantity": quantity,
+                "subtotal": subtotal,
+            }
+        )
+
+    if removed_ids:
+        for product_id in removed_ids:
+            cart.pop(str(product_id), None)
+        request.session["cart"] = cart
+        request.session.modified = True
+        messages.info(
+            request,
+            "Se actualizó tu carrito porque algunos productos ya no están disponibles.",
+        )
+        if not cart_items:
+            messages.warning(request, "Tu carrito está vacío.")
+            return redirect("store:cart_detail")
 
     if request.method == "POST":
         form = CheckoutForm(request.POST)
@@ -224,6 +383,7 @@ def checkout(request):
         if form.is_valid():
             order = form.save(commit=False)
             order.user = request.user
+            order.is_completed = False
             order.save()
 
             for item in cart_items:
@@ -249,6 +409,11 @@ def checkout(request):
 
                 product.stock -= quantity
                 product.save()
+
+            # Marcamos como completada solo cuando todos los items fueron creados
+            # y el stock fue actualizado.
+            order.is_completed = True
+            order.save(update_fields=["is_completed"])
 
             request.session["cart"] = {}
             request.session.modified = True

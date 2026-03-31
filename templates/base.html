@@ -215,12 +215,15 @@
                                 </div>
                                 <div class="text-end">
                                     <div class="fw-semibold">${{ item.subtotal|floatformat:0|intcomma }}</div>
-                                    <a
-                                        href="{% url 'store:remove_from_cart' item.product.pk %}"
-                                        class="small link-danger text-decoration-none"
-                                    >
-                                        Quitar
-                                    </a>
+                                    <form method="post" action="{% url 'store:remove_from_cart' item.product.pk %}">
+                                        {% csrf_token %}
+                                        <button
+                                            type="submit"
+                                            class="btn btn-link p-0 small link-danger text-decoration-none"
+                                        >
+                                            Quitar
+                                        </button>
+                                    </form>
                                 </div>
                             </li>
                         {% endfor %}
@@ -249,18 +252,27 @@
         </div>
     {% endif %}
 
-    <footer class="app-footer bg-chinese text-light mt-5">
-        <div class="container py-4 small">
-            <div class="row g-3 align-items-center">
-                <div class="col-md-6">
-                    <span id="year"></span> Purple Store · Django + Bootstrap 5
-                </div>
-                <div class="col-md-6 text-md-end">
-                    Proyecto final Bootcamp Full Stack Python
-                </div>
-            </div>
+<footer class="footer mt-auto py-4 border-top">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+
+        <div class="text-muted small">
+            {% now "Y" %} Purple Store · Proyecto de portafolio desarrollado con Django & Bootstrap
         </div>
-    </footer>
+
+        <div class="d-flex gap-3 small">
+            <a href="{% url 'core:about' %}" class="text-decoration-none text-muted">
+                Sobre el proyecto
+            </a>
+            <a href="/admin/" class="text-decoration-none text-muted">
+                Admin
+            </a>
+            <a href="https://github.com/naabit" class="text-decoration-none text-muted">
+                GitHub
+            </a>
+        </div>
+
+    </div>
+</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

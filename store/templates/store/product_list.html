@@ -13,6 +13,68 @@
         </div>
     </div>
 
+    <div class="surface filter-bar filter-bar--minimal mb-4">
+        <form method="get" class="d-flex flex-column flex-md-row flex-wrap gap-2 align-items-md-center">
+            <div class="flex-grow-1" style="min-width: 220px;">
+                <label for="filter-q" class="visually-hidden">Buscar</label>
+                <input
+                    id="filter-q"
+                    name="q"
+                    type="search"
+                    class="form-control form-control-sm"
+                    placeholder="Buscar productos..."
+                    value="{{ filters.q }}"
+                    autocomplete="off"
+                >
+            </div>
+
+            <div style="min-width: 180px;">
+                <label for="filter-category" class="visually-hidden">Categoría</label>
+                <select id="filter-category" name="category" class="form-select form-select-sm">
+                    <option value="">Todas</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if filters.category == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="min-width: 190px;">
+                <label for="filter-sort" class="visually-hidden">Orden</label>
+                <select id="filter-sort" name="sort" class="form-select form-select-sm">
+                    <option value="">Orden: recomendado</option>
+                    <option value="name_asc" {% if filters.sort == "name_asc" %}selected{% endif %}>Nombre (A-Z)</option>
+                    <option value="name_desc" {% if filters.sort == "name_desc" %}selected{% endif %}>Nombre (Z-A)</option>
+                    <option value="price_asc" {% if filters.sort == "price_asc" %}selected{% endif %}>Precio (menor)</option>
+                    <option value="price_desc" {% if filters.sort == "price_desc" %}selected{% endif %}>Precio (mayor)</option>
+                    <option value="newest" {% if filters.sort == "newest" %}selected{% endif %}>Más nuevos</option>
+                </select>
+            </div>
+
+            <div class="form-check ms-md-1">
+                <input
+                    id="filter-in-stock"
+                    class="form-check-input"
+                    type="checkbox"
+                    name="in_stock"
+                    value="1"
+                    {% if filters.in_stock %}checked{% endif %}
+                >
+                <label class="form-check-label small" for="filter-in-stock">
+                    Stock
+                </label>
+            </div>
+
+  
+
+            <div class="d-flex gap-2 ms-md-auto">
+                <button type="submit" class="btn btn-majorelle btn-sm">Filtrar</button>
+                <a href="{% url 'store:product_list' %}" class="btn btn-outline-brand btn-sm">Limpiar</a>
+            </div>
+        </form>
+    </div>
+
     {% if products %}
         <div class="row g-4">
             {% for product in products %}

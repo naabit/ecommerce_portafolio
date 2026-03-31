@@ -1,3 +1,11 @@
+"""
+Vistas de autenticación y registro.
+
+- Login basado en `LoginView` de Django.
+- Logout via POST.
+- Registro de usuario cliente (grupo `cliente`).
+"""
+
 from django.contrib import messages
 from django.contrib.auth import logout, login
 from django.contrib.auth.models import Group
@@ -8,6 +16,8 @@ from .forms import UserRegisterForm
 
 
 class UserLoginView(LoginView):
+    """Login con feedback por mensajes (Django messages framework)."""
+
     template_name = "users/login.html"
     redirect_authenticated_user = True
 
@@ -21,6 +31,8 @@ class UserLoginView(LoginView):
 
 
 class UserLogoutView(View):
+    """Cierra sesión mediante POST para evitar logout por enlace GET."""
+
     def post(self, request):
         logout(request)
         messages.success(request, "Has cerrado sesión correctamente.")
@@ -28,6 +40,7 @@ class UserLogoutView(View):
 
 
 def register(request):
+    """Crea un usuario y lo asigna al grupo `cliente`."""
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():

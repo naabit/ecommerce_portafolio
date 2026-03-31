@@ -12,6 +12,9 @@ class Command(BaseCommand):
     help = "Puebla la base de datos con datos iniciales (grupos, usuarios, categorías y productos)."
 
     def handle(self, *args, **kwargs):
+        # Comando de apoyo para evaluaciÃ³n/demo:
+        # - crea usuarios de prueba (cliente/staff/admin)
+        # - crea categorÃ­as y productos para el catÃ¡logo
         self.stdout.write(self.style.WARNING("Iniciando seed de datos..."))
 
         self.create_groups()
@@ -45,7 +48,7 @@ class Command(BaseCommand):
         staff_group.permissions.add(*product_permissions)
 
         # ------------------------
-        # PERMISOS PARA ORDER (si existe)
+        # PERMISOS PARA ORDER 
         # ------------------------
         try:
             from store.models import Order
