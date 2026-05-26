@@ -11,7 +11,7 @@ if not SECRET_KEY:
     raise RuntimeError("Falta SECRET_KEY en el archivo .env")
 
 DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -32,6 +32,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir archivos estáticos en producción
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -117,6 +118,9 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Destino para `collectstatic` (producción)
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Configuración para servir archivos estáticos con WhiteNoise en producción
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
