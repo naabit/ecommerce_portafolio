@@ -1,135 +1,229 @@
-# 🟣 Purple Store - E-commerce
+# Purple Store
 
-Proyecto final de e-commerce desarrollado con **Django + PostgreSQL +
-Bootstrap 5**, que implementa un flujo completo de compra:
+E-commerce desarrollado con Django, PostgreSQL y Bootstrap 5. El proyecto implementa un flujo de compra funcional que incluye catálogo, carrito, autenticación, checkout y generación de órdenes.
 
--  **catálogo → carrito → checkout → confirmación**
+Está pensado como proyecto de portafolio para demostrar desarrollo backend con Django, persistencia de datos, manejo de sesiones, autenticación de usuarios y despliegue en producción.
 
-------------------------------------------------------------------------
+## Demo
 
-## 🔗 Repositorio
+Aplicación desplegada en Render:
 
- -  *\[https://github.com/naabit/ecommerce_portafolio\]* 
+https://ecommerce-portafolio.onrender.com
 
-------------------------------------------------------------------------
+## Características principales
 
-##  Características principales
+* Catálogo de productos almacenado en base de datos.
+* Visualización de productos por categoría.
+* Detalle individual de cada producto.
+* Carrito de compras basado en sesión.
+* Registro, inicio y cierre de sesión de usuarios.
+* Checkout con creación de órdenes y detalle de productos comprados.
+* Asociación de órdenes a usuarios autenticados.
+* Mensajes de confirmación y error durante la navegación.
+* Panel de administración mediante Django Admin.
+* Gestión de stock desde el modelo de productos.
+* Interfaz responsive construida con Bootstrap 5.
+* Comando de carga inicial para categorías, productos y usuarios de demostración.
 
--   🔐 Autenticación de usuarios (cliente, staff, admin)
--   🛍️ Catálogo de productos persistido en base de datos
--   🛒 Carrito de compras en sesión
--   📦 Checkout con generación de órdenes
--   🧾 Asociación de órdenes a usuarios autenticados
--   ⚙️ Panel de administración (Django Admin)
--   💬 Mensajes de feedback (éxito/error)
--   🎨 Interfaz responsive con Bootstrap 5
+## Tecnologías
 
-------------------------------------------------------------------------
+* Python
+* Django
+* PostgreSQL
+* Bootstrap 5
+* HTML
+* CSS
+* Gunicorn
+* WhiteNoise
+* Render
 
-## 🧱 Tecnologías utilizadas
+## Estructura general
 
--   Python 3.11+
--   Django
--   PostgreSQL
--   Bootstrap 5
--   HTML + CSS
+```text
+ecommerce_portafolio/
+├── config/                 # Configuración principal de Django
+├── core/                   # Vistas y páginas generales
+├── store/                  # Catálogo, carrito, checkout y órdenes
+│   └── management/
+│       └── commands/
+│           └── seed_data.py
+├── users/                  # Registro, login y manejo de usuarios
+├── static/                 # Archivos estáticos del proyecto
+├── templates/              # Templates globales
+├── build.sh                # Script de construcción para despliegue
+├── manage.py
+├── requirements.txt
+└── runtime.txt
+```
 
-------------------------------------------------------------------------
+## Instalación local
 
-## ⚙️ Instalación (local)
+Clona el repositorio:
 
-``` bash
-git clone https://github.com/naabit/ecommerce_portafolio
+```bash
+git clone https://github.com/naabit/ecommerce_portafolio.git
 cd ecommerce_portafolio
+```
+
+Crea y activa un entorno virtual:
+
+### Windows PowerShell
+
+```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
+```
+
+### macOS o Linux
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+Instala las dependencias:
+
+```bash
 pip install -r requirements.txt
 ```
 
-------------------------------------------------------------------------
+## Configuración de variables de entorno
 
-## 🔐 Configuración (.env)
+Crea un archivo llamado `.env` en la raíz del proyecto:
 
-Crear archivo `.env`:
+```env
+SECRET_KEY=tu_clave_secreta_de_django
+DEBUG=True
+DATABASE_URL=postgresql://postgres:tu_password@localhost:5432/ecommerce_db
+```
 
-    SECRET_KEY=tu_clave_secreta
-    DEBUG=True
-    DB_NAME=ecommerce_db
-    DB_USER=postgres
-    DB_PASSWORD=tu_password
-    DB_HOST=localhost
-    DB_PORT=5432
+Para producción, `DEBUG` debe estar configurado como:
 
-------------------------------------------------------------------------
+```env
+DEBUG=False
+```
 
-## 🗄️ Base de datos
+En Render, las variables de entorno se configuran desde el panel del servicio web. La aplicación requiere, como mínimo:
 
-``` sql
+```env
+SECRET_KEY=tu_clave_secreta
+DEBUG=False
+DATABASE_URL=postgresql://usuario:password@host:puerto/nombre_base_de_datos
+```
+
+## Base de datos local
+
+Crea una base de datos PostgreSQL:
+
+```sql
 CREATE DATABASE ecommerce_db;
 ```
 
-``` bash
+Luego aplica las migraciones:
+
+```bash
 python manage.py migrate
 ```
 
-------------------------------------------------------------------------
+## Datos iniciales
 
-## 🌱 Datos de prueba
+El proyecto incluye un comando para crear categorías, productos, grupos y usuarios de demostración.
 
-``` bash
+```bash
 python manage.py seed_data
 ```
 
-### 🔑 Credenciales
+El comando puede ejecutarse más de una vez sin duplicar categorías ni productos, ya que utiliza `get_or_create`.
 
--   cliente_demo / Cliente1234
--   staff_demo / Staff1234
--   admin_demo / Admin1234
+Para fines de desarrollo local, crea los siguientes usuarios:
 
-------------------------------------------------------------------------
+```text
+cliente_demo
+staff_demo
+admin_demo
+```
 
-## ▶️ Ejecutar
+Por seguridad, las credenciales de administración no deben usarse en una instancia pública de producción. En un entorno desplegado, se recomienda crear un superusuario propio con una contraseña privada:
 
-``` bash
+```bash
+python manage.py createsuperuser
+```
+
+## Ejecutar el proyecto
+
+```bash
 python manage.py runserver
 ```
 
--  http://127.0.0.1:8000/
+Luego abre:
 
-------------------------------------------------------------------------
+```text
+http://127.0.0.1:8000/
+```
 
-## 🌐 Rutas principales
+## Rutas principales
 
 ### Públicas
 
--   /
--   /about/
--   /store/
--   /store/producto/`<id>`{=html}/
+```text
+/
+ /about/
+ /store/
+ /store/producto/<id>/
+```
 
-### Cliente
+### Compra
 
--   /store/carrito/
--   /store/checkout/
--   /store/checkout/exito/`<id>`{=html}/
+```text
+/store/carrito/
+/store/checkout/
+/store/checkout/exito/<id>/
+```
 
-### Auth
+### Usuarios
 
--   /users/login/
--   /users/register/
--   /users/logout/
+```text
+/users/login/
+/users/register/
+/users/logout/
+```
 
-### Admin
+### Administración
 
--   /admin/
+```text
+/admin/
+```
 
-------------------------------------------------------------------------
+## Despliegue
 
+La aplicación está preparada para desplegarse en Render.
 
+El archivo `build.sh` ejecuta la instalación de dependencias, la recolección de archivos estáticos, las migraciones y la carga de datos iniciales:
 
-## 💡 Próximas mejoras
+```bash
+#!/usr/bin/env bash
+set -o errexit
 
--   Pagos online
--   Historial de órdenes
--   Filtros avanzados
--   Deploy
+pip install -r requirements.txt
+
+python manage.py collectstatic --no-input
+python manage.py migrate
+python manage.py seed_data
+```
+
+Para que el despliegue funcione correctamente, el servicio web debe tener configurada la variable `DATABASE_URL` con la URL interna de la base de datos PostgreSQL creada en Render.
+
+## Próximas mejoras
+
+* Integración con una pasarela de pagos.
+* Historial de compras para usuarios autenticados.
+* Filtros y búsqueda avanzada de productos.
+* Paginación del catálogo.
+* Gestión de imágenes de productos desde Django Admin.
+* Pruebas automatizadas para carrito, checkout y autenticación.
+* Confirmación de compra por correo electrónico.
+* Mejoras de accesibilidad y experiencia móvil.
+
+## Autoría
+
+Desarrollado por Natalia García Cofré como proyecto de portafolio enfocado en desarrollo backend con Django, bases de datos relacionales y construcción de flujos funcionales de e-commerce.
