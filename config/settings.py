@@ -12,9 +12,18 @@ if not SECRET_KEY:
     raise RuntimeError("Falta SECRET_KEY en el archivo .env")
 
 DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
-ALLOWED_HOSTS = ["https://ecommerce-portafolio.onrender.com/"]
 
+ALLOWED_HOSTS = [
+    "ecommerce-portafolio.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://ecommerce-portafolio.onrender.com",
+]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Application definition
 
 INSTALLED_APPS = [
