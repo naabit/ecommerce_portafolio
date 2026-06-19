@@ -11,7 +11,7 @@ if not SECRET_KEY:
     raise RuntimeError("Falta SECRET_KEY en el archivo .env")
 
 DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["https://ecommerce-portafolio.onrender.com/"]
 
 
 # Application definition
