@@ -77,14 +77,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise RuntimeError(
+        "Falta DATABASE_URL. Configúrala en Render o en tu archivo .env local."
+    )
+
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
+        default=DATABASE_URL,
         conn_max_age=600,
         ssl_require=not DEBUG,
     )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
